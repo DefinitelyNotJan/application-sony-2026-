@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Jan Lönnqvist / Print & Localisation Manager / Sony Pictures</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --black: #000;
+            --warm-black: #0a0a08;
+            --amber: #ffb800;
+            --amber-dim: rgba(255,184,0,0.12);
+            --red: #ff2d2d;
+            --white: #f0ece4;
+            --grey: rgba(240,236,228,0.4);
+        }
+
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--black);
+            color: var(--white);
+            overflow-x: hidden;
+        }
+
+        /* ── PROJECTOR FLICKER ── */
+        .flicker-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            animation: flicker 0.15s infinite;
+            background: transparent;
+        }
+        @keyframes flicker {
+            0% { opacity: 0; }
+            5% { opacity: 0.02; background: var(--white); }
+            6% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        /* ── FILM SPROCKETS (left + right rails) ── */
+        .sprocket-rail {
+            position: fixed;
+            top: 0;
+            width: 28px;
+            height: 100vh;
+            z-index: 100;
+            background: #111;
+            overflow: hidden;
+        }
+        .sprocket-rail.left { left: 0; }
+        .sprocket-rail.right { right: 0; }
+        .sprocket-holes {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 8px 6px;
+            animation: sprocketScroll 4s linear infinite;
+        }
+        .sprocket-hole {
+            width: 16px;
+            height: 10px;
+            border-radius: 2px;
+            background: var(--black);
+            border: 1px solid #222;
+            flex-shrink: 0;
+        }
+        @keyframes sprocketScroll {
+            from { transform: translateY(0); }
+            to { transform: translateY(-26px); }
+        }
+
+        /* ── COUNTDOWN INTRO ── */
+        .countdown {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: var(--black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s;
+        }
+        .countdown.done {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .countdown-num {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 200px;
+            color: var(--white);
+            opacity: 0;
+            position: absolute;
+        }
+        .countdown-circle {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border: 2px solid rgba(240,236,228,0.2);
+            border-radius: 50%;
+        }
+        .countdown-cross {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+        }
+        .countdown-cross::before, .countdown-cross::after {
+            content: '';
+            position: absolute;
+            background: rgba(240,236,228,0.15);
+        }
+        .countdown-cross::before {
+            width: 1px; height: 100%; left: 50%; top: 0;
+        }
+        .countdown-cross::after {
+            width: 100%; height: 1px; top: 50%; left: 0;
+        }
+
+        /* ── CONTENT WRAPPER (inside film rails) ── */
+        .content {
+            margin: 0 28px;
+        }
+
+        /* ── TITLE CARD (full viewport) ── */
+        .title-card {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .title-card .tc-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 40px;
+        }
+        .title-card h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(60px, 12vw, 160px);
+            line-height: 0.9;
+            letter-spacing: 4px;
+        }
+        .title-card h1 .dim {
+            color: var(--grey);
+        }
+        .title-card .tc-sub {
+            font-size: 14px;
+            color: var(--grey);
+            margin-top: 32px;
+            max-width: 480px;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        /* Rotating countdown-style circle in hero bg */
+        .hero-reticle {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border: 1px solid rgba(255,184,0,0.06);
+            border-radius: 50%;
+            animation: reticleSpin 30s linear infinite;
+        }
+        .hero-reticle::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            top: 50%;
+            background: rgba(255,184,0,0.04);
+        }
+        .hero-reticle::after {
+            content: '';
+            position: absolute;
+            width: 1px;
+            height: 100%;
+            left: 50%;
+            background: rgba(255,184,0,0.04);
+        }
+        .hero-reticle-2 {
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            border: 1px solid rgba(255,184,0,0.04);
+            border-radius: 50%;
+            animation: reticleSpin 20s linear infinite reverse;
+        }
+        @keyframes reticleSpin { to { transform: rotate(360deg); } }
+
+        .tc-scroll {
+            position: absolute;
+            bottom: 40px;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--grey);
+        }
+        .tc-scroll::after {
+            content: '';
+            display: block;
+            width: 1px;
+            height: 30px;
+            background: var(--amber);
+            margin: 12px auto 0;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scaleY(1); opacity: 1; }
+            50% { transform: scaleY(0.4); opacity: 0.3; }
+        }
+
+        /* ── SCENE CARDS ── */
+        .scene {
+            min-height: 100vh;
+            padding: 120px 60px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            border-top: 1px solid rgba(255,184,0,0.06);
+        }
+        .scene-number {
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 4px;
+            color: rgba(255,184,0,0.3);
+        }
+        .scene-timecode {
+            position: absolute;
+            top: 40px;
+            right: 60px;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: rgba(240,236,228,0.15);
+        }
+
+        /* Scene: About */
+        .scene-about .scene-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            width: 100%;
+            max-width: 1100px;
+        }
+        .scene-about h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(36px, 5vw, 64px);
+            line-height: 1.0;
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+        }
+        .scene-about h2 .amber { color: var(--amber); }
+        .scene-about p {
+            font-size: 14px;
+            line-height: 1.9;
+            color: var(--grey);
+            font-weight: 300;
+        }
+
+        .about-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            justify-content: center;
+        }
+        .a-stat {
+            display: flex;
+            align-items: baseline;
+            gap: 20px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid rgba(255,184,0,0.08);
+        }
+        .a-stat:last-child { border-bottom: none; }
+        .a-stat-num {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 56px;
+            color: var(--amber);
+            line-height: 1;
+            min-width: 80px;
+        }
+        .a-stat-text {
+            font-size: 13px;
+            color: var(--grey);
+            line-height: 1.5;
+        }
+
+        /* Scene: Why Sony */
+        .scene-why .scene-inner {
+            max-width: 1000px;
+            width: 100%;
+        }
+        .scene-why h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(36px, 5vw, 64px);
+            line-height: 1.0;
+            letter-spacing: 2px;
+            margin-bottom: 60px;
+            max-width: 600px;
+        }
+        .why-blocks {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2px;
+        }
+        .why-block {
+            background: rgba(255,184,0,0.03);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.4s;
+        }
+        .why-block:hover {
+            background: rgba(255,184,0,0.07);
+        }
+        .why-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 0;
+            background: var(--amber);
+            transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .why-block:hover::before { height: 100%; }
+        .why-block h4 {
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            color: var(--white);
+        }
+        .why-block p {
+            font-size: 13px;
+            line-height: 1.7;
+            color: var(--grey);
+            font-weight: 300;
+        }
+
+        /* ── HORIZONTAL FILM STRIP (DHL Case) ── */
+        .filmstrip-wrapper {
+            position: relative;
+            padding: 80px 0;
+            border-top: 1px solid rgba(255,184,0,0.06);
+            border-bottom: 1px solid rgba(255,184,0,0.06);
+            overflow: hidden;
+        }
+        .filmstrip-label {
+            position: absolute;
+            top: 30px;
+            left: 88px;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--amber);
+            z-index: 2;
+        }
+        .filmstrip-title {
+            padding: 0 88px;
+            margin-bottom: 48px;
+            padding-top: 40px;
+        }
+        .filmstrip-title h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(36px, 5vw, 64px);
+            letter-spacing: 2px;
+            line-height: 1;
+        }
+        .filmstrip-title p {
+            font-size: 14px;
+            color: var(--grey);
+            margin-top: 16px;
+            max-width: 600px;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        .filmstrip-scroll {
+            display: flex;
+            gap: 2px;
+            overflow-x: auto;
+            padding: 0 88px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .filmstrip-scroll::-webkit-scrollbar { display: none; }
+
+        .film-cell {
+            flex-shrink: 0;
+            width: 380px;
+            background: var(--warm-black);
+            border: 1px solid rgba(255,184,0,0.08);
+            scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
+        }
+        .film-cell-top {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255,184,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Space Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 2px;
+            color: rgba(255,184,0,0.4);
+        }
+        .film-cell-body {
+            padding: 32px;
+        }
+        .film-cell-num {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 72px;
+            color: rgba(255,184,0,0.1);
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+        .film-cell h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .film-cell p {
+            font-size: 13px;
+            line-height: 1.7;
+            color: var(--grey);
+            font-weight: 300;
+        }
+        .film-cell-sprockets {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 16px;
+            border-top: 1px solid rgba(255,184,0,0.06);
+        }
+        .mini-hole {
+            width: 8px;
+            height: 5px;
+            border-radius: 1px;
+            background: rgba(255,184,0,0.06);
+        }
+
+        /* ── SKILLS (typewriter monospace style) ── */
+        .skills-scene {
+            padding: 140px 60px;
+            border-top: 1px solid rgba(255,184,0,0.06);
+            position: relative;
+        }
+        .skills-scene .scene-number {
+            position: absolute;
+            top: 40px;
+            left: 60px;
+        }
+        .skills-scene h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(36px, 5vw, 64px);
+            letter-spacing: 2px;
+            margin-bottom: 60px;
+        }
+        .skills-two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            max-width: 1000px;
+        }
+        .skill-cat-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,184,0,0.15);
+        }
+        .skill-line {
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            padding: 10px 0;
+            color: var(--grey);
+            border-bottom: 1px solid rgba(240,236,228,0.04);
+            transition: color 0.3s, transform 0.3s;
+            cursor: default;
+        }
+        .skill-line:hover {
+            color: var(--amber);
+            transform: translateX(8px);
+        }
+        .skill-line::before {
+            content: '> ';
+            color: rgba(255,184,0,0.3);
+        }
+
+        /* ── CREDITS (experience) ── */
+        .credits-section {
+            padding: 140px 60px;
+            border-top: 1px solid rgba(255,184,0,0.06);
+            text-align: center;
+            position: relative;
+        }
+        .credits-section h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(36px, 5vw, 64px);
+            letter-spacing: 4px;
+            margin-bottom: 80px;
+        }
+        .credit-block {
+            margin-bottom: 48px;
+        }
+        .credit-role {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 8px;
+        }
+        .credit-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 32px;
+            letter-spacing: 3px;
+            margin-bottom: 4px;
+        }
+        .credit-detail {
+            font-size: 12px;
+            color: var(--grey);
+            font-weight: 300;
+        }
+        .credit-divider {
+            width: 40px;
+            height: 1px;
+            background: rgba(255,184,0,0.2);
+            margin: 48px auto;
+        }
+
+        /* ── PERSONAL (end card) ── */
+        .end-card {
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-top: 1px solid rgba(255,184,0,0.06);
+        }
+        .end-card-inner {
+            display: flex;
+            gap: 80px;
+            text-align: center;
+        }
+        .end-item h4 {
+            font-family: 'Space Mono', monospace;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255,184,0,0.4);
+            margin-bottom: 8px;
+        }
+        .end-item p {
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .end-item .sub {
+            font-size: 12px;
+            color: var(--grey);
+            font-weight: 300;
+            margin-top: 4px;
+        }
+
+        /* ── CTA (final frame) ── */
+        .final-frame {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            border-top: 1px solid rgba(255,184,0,0.06);
+        }
+        .final-frame h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(48px, 8vw, 120px);
+            letter-spacing: 4px;
+            line-height: 0.95;
+            margin-bottom: 24px;
+        }
+        .final-frame h2 .amber { color: var(--amber); }
+        .final-frame p {
+            font-size: 14px;
+            color: var(--grey);
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+        .final-btn {
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--black);
+            background: var(--amber);
+            text-decoration: none;
+            padding: 16px 48px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        .final-btn:hover { transform: scale(1.05); }
+
+        .final-reticle {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border: 1px solid rgba(255,184,0,0.04);
+            border-radius: 50%;
+            animation: reticleSpin 25s linear infinite;
+        }
+
+        footer {
+            border-top: 1px solid rgba(255,184,0,0.06);
+            padding: 28px 88px;
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: rgba(240,236,228,0.2);
+            letter-spacing: 2px;
+        }
+
+        /* ── REVEAL ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .sprocket-rail { width: 16px; }
+            .sprocket-hole { width: 8px; height: 6px; }
+            .content { margin: 0 16px; }
+            .scene { padding: 80px 24px; }
+            .scene-number, .scene-timecode { left: 24px; right: 24px; }
+            .scene-about .scene-inner { grid-template-columns: 1fr; gap: 48px; }
+            .why-blocks { grid-template-columns: 1fr; }
+            .filmstrip-label { left: 40px; }
+            .filmstrip-title { padding: 40px 24px 0; }
+            .filmstrip-scroll { padding: 0 24px; }
+            .film-cell { width: 300px; }
+            .skills-scene { padding: 80px 24px; }
+            .skills-two-col { grid-template-columns: 1fr; gap: 48px; }
+            .credits-section { padding: 80px 24px; }
+            .end-card-inner { flex-direction: column; gap: 32px; }
+            footer { padding: 24px; flex-direction: column; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── COUNTDOWN ── -->
+<div class="countdown" id="countdown">
+    <div class="countdown-circle"></div>
+    <div class="countdown-cross"></div>
+    <div class="countdown-num" id="cNum">3</div>
+</div>
+
+<!-- ── FLICKER ── -->
+<div class="flicker-overlay"></div>
+
+<!-- ── SPROCKET RAILS ── -->
+<div class="sprocket-rail left">
+    <div class="sprocket-holes" id="sprocketsL"></div>
+</div>
+<div class="sprocket-rail right">
+    <div class="sprocket-holes" id="sprocketsR"></div>
+</div>
+
+<div class="content">
+
+<!-- ── TITLE CARD ── -->
+<section class="title-card">
+    <div class="hero-reticle"></div>
+    <div class="hero-reticle-2"></div>
+    <div class="tc-label">Sony Pictures Entertainment / Application</div>
+    <h1>
+        PRINT<br>
+        <span class="dim">&</span> LOCALISATION<br>
+        MANAGER
+    </h1>
+    <p class="tc-sub">8+ years in DTP, print production, and multi-market localisation. From print houses to global brands / built for precision at scale.</p>
+    <div class="tc-scroll">Scroll</div>
+</section>
+
+<!-- ── SCENE 01: ABOUT ── -->
+<section class="scene scene-about">
+    <div class="scene-number">SCENE 01</div>
+    <div class="scene-timecode">00:01:00:00</div>
+    <div class="scene-inner">
+        <div>
+            <h2 class="reveal">BUILT FOR <span class="amber">PRINT.</span><br>TRAINED IN<br>LOCALISATION.</h2>
+            <p class="reveal">I'm Jan, a designer and production specialist from Finland, based in the Netherlands. My career started on the production floor / DTP and pre-press at print houses in Helsinki. From there I moved into brand-side design for IKEA, HelloFresh, Rituals, and DHL / always with print precision and multi-market adaptation at the core. I understand the full pipeline from file preparation to final delivery, and I've personally localised campaign assets across European markets.</p>
+        </div>
+        <div class="about-stats">
+            <div class="a-stat reveal">
+                <div class="a-stat-num">8+</div>
+                <div class="a-stat-text">Years in DTP, print production, and graphic design</div>
+            </div>
+            <div class="a-stat reveal">
+                <div class="a-stat-num">6+</div>
+                <div class="a-stat-text">Major brands / DHL, Rituals, HelloFresh, IKEA, Valve</div>
+            </div>
+            <div class="a-stat reveal">
+                <div class="a-stat-num">EU</div>
+                <div class="a-stat-text">Multi-market localisation / personally adapting assets across regions</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── SCENE 02: WHY SONY ── -->
+<section class="scene scene-why">
+    <div class="scene-number">SCENE 02</div>
+    <div class="scene-timecode">00:02:00:00</div>
+    <div class="scene-inner">
+        <h2 class="reveal">WHY SONY<br>PICTURES</h2>
+        <div class="why-blocks">
+            <div class="why-block reveal">
+                <h4>Hands-On Localisation</h4>
+                <p>At agency level for DHL, I personally localised campaign assets across multiple European markets / adapting layouts, typography, and messaging for each region. Not just overseeing, doing the work.</p>
+            </div>
+            <div class="why-block reveal">
+                <h4>Print Production Roots</h4>
+                <p>Career started at print houses (Multiprint, Lönnberg Painot) / deep understanding of pre-press, file preparation, colour management, and production workflows from the ground up.</p>
+            </div>
+            <div class="why-block reveal">
+                <h4>High-Volume Delivery</h4>
+                <p>Managed creative production at scale for IKEA, HelloFresh, and Rituals / where systematic workflows, tight deadlines, and quality control across every asset are non-negotiable.</p>
+            </div>
+            <div class="why-block reveal">
+                <h4>Cross-Team Coordination</h4>
+                <p>Experience coordinating across design teams, translators, and external vendors. Team leading and project management at HelloFresh. Stakeholder communication across markets at DHL.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── FILM STRIP: DHL CASE ── -->
+<div class="filmstrip-wrapper">
+    <div class="filmstrip-label reveal">Case / DHL</div>
+    <div class="filmstrip-title">
+        <h2 class="reveal">DATA TO DESIGN<br>TO LOCALISATION</h2>
+        <p class="reveal">As Senior Graphic Designer at agency level for DHL, I handled the full creative pipeline / from data-driven design to personally localising every asset across European markets.</p>
+    </div>
+    <div class="filmstrip-scroll">
+        <div class="film-cell">
+            <div class="film-cell-top"><span>FRAME 001</span><span>DHL/EU</span></div>
+            <div class="film-cell-body">
+                <div class="film-cell-num">01</div>
+                <h4>Data-Driven Creative</h4>
+                <p>Campaign designs built from performance data and market insights. Every visual decision informed by what drives results in each specific market.</p>
+            </div>
+            <div class="film-cell-sprockets">
+                <div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div>
+            </div>
+        </div>
+        <div class="film-cell">
+            <div class="film-cell-top"><span>FRAME 002</span><span>DHL/EU</span></div>
+            <div class="film-cell-body">
+                <div class="film-cell-num">02</div>
+                <h4>Self-Led Localisation</h4>
+                <p>Personally adapted and localised campaign assets for multiple European markets / adjusting layouts, copy placement, and typography to work across languages and formats.</p>
+            </div>
+            <div class="film-cell-sprockets">
+                <div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div>
+            </div>
+        </div>
+        <div class="film-cell">
+            <div class="film-cell-top"><span>FRAME 003</span><span>DHL/EU</span></div>
+            <div class="film-cell-body">
+                <div class="film-cell-num">03</div>
+                <h4>Hammam Campaign</h4>
+                <p>Designed the Hammam campaign which achieved the highest sales in the product's history / combining data-informed creative with precise localisation across regions.</p>
+            </div>
+            <div class="film-cell-sprockets">
+                <div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div>
+            </div>
+        </div>
+        <div class="film-cell">
+            <div class="film-cell-top"><span>FRAME 004</span><span>DHL/EU</span></div>
+            <div class="film-cell-body">
+                <div class="film-cell-num">04</div>
+                <h4>Scalable Systems</h4>
+                <p>Built template systems and creative frameworks that enabled rapid production of localised campaigns / maintaining brand integrity while adapting for each market.</p>
+            </div>
+            <div class="film-cell-sprockets">
+                <div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div><div class="mini-hole"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── SKILLS ── -->
+<section class="skills-scene">
+    <div class="scene-number">SCENE 03</div>
+    <h2 class="reveal">CAPABILITIES</h2>
+    <div class="skills-two-col">
+        <div class="reveal">
+            <div class="skill-cat-label">Print & Production</div>
+            <div class="skill-line">DTP / Pre-Press</div>
+            <div class="skill-line">Print Production Workflows</div>
+            <div class="skill-line">File Preparation & QC</div>
+            <div class="skill-line">Campaign Localisation</div>
+            <div class="skill-line">Multi-Format Asset Delivery</div>
+            <div class="skill-line">Colour Management</div>
+            <div class="skill-line">Asset Management Systems</div>
+        </div>
+        <div class="reveal">
+            <div class="skill-cat-label">Creative & Tools</div>
+            <div class="skill-line">Adobe Creative Suite</div>
+            <div class="skill-line">Figma</div>
+            <div class="skill-line">Graphic Design</div>
+            <div class="skill-line">Typography & Layout</div>
+            <div class="skill-line">Illustration</div>
+            <div class="skill-line">Project Management</div>
+            <div class="skill-line">Team Leading</div>
+        </div>
+    </div>
+</section>
+
+<!-- ── CREDITS (Experience) ── -->
+<section class="credits-section">
+    <h2 class="reveal">CREDITS</h2>
+
+    <div class="credit-block reveal">
+        <div class="credit-role">Senior Graphic Designer / 2024</div>
+        <div class="credit-name">DHL (AGENCY)</div>
+        <div class="credit-detail">Multi-market campaigns / Data-driven design / Self-led localisation</div>
+    </div>
+    <div class="credit-divider"></div>
+
+    <div class="credit-block reveal">
+        <div class="credit-role">Visual Specialist / 2022-2024</div>
+        <div class="credit-name">RITUALS COSMETICS</div>
+        <div class="credit-detail">DTP / Graphic design / Seasonal campaigns / Packaging / Retail</div>
+    </div>
+    <div class="credit-divider"></div>
+
+    <div class="credit-block reveal">
+        <div class="credit-role">Creative / DTP / 2022</div>
+        <div class="credit-name">HELLOFRESH</div>
+        <div class="credit-detail">DTP / Team leading / Project management</div>
+    </div>
+    <div class="credit-divider"></div>
+
+    <div class="credit-block reveal">
+        <div class="credit-role">Graphic Artist / 2019-2020</div>
+        <div class="credit-name">IKEA GROUP</div>
+        <div class="credit-detail">DTP / Graphic design / Retail</div>
+    </div>
+    <div class="credit-divider"></div>
+
+    <div class="credit-block reveal">
+        <div class="credit-role">Art Director / 2019</div>
+        <div class="credit-name">VALVE</div>
+        <div class="credit-detail">Art direction / DTP / Graphic design</div>
+    </div>
+    <div class="credit-divider"></div>
+
+    <div class="credit-block reveal">
+        <div class="credit-role">DTP & Graphic Designer / 2013-2018</div>
+        <div class="credit-name">PRINT & DESIGN STUDIOS</div>
+        <div class="credit-detail">Multiprint / Lönnberg Painot / Pixmill Group / Planex / Cocomms</div>
+    </div>
+</section>
+
+<!-- ── END CARD ── -->
+<section class="end-card">
+    <div class="end-card-inner">
+        <div class="end-item reveal">
+            <h4>Location</h4>
+            <p>Amsterdam, NL</p>
+            <p class="sub">Open to Brussels relocation</p>
+        </div>
+        <div class="end-item reveal">
+            <h4>Languages</h4>
+            <p>Fluent English, Native Finnish</p>
+            <p class="sub">International team experience</p>
+        </div>
+        <div class="end-item reveal">
+            <h4>Education</h4>
+            <p>Bachelor of Culture and Arts</p>
+            <p class="sub">Graphic Design / Helsinki</p>
+        </div>
+    </div>
+</section>
+
+<!-- ── FINAL FRAME ── -->
+<section class="final-frame">
+    <div class="final-reticle"></div>
+    <h2 class="reveal">LET'S MAKE<br><span class="amber">PRECISION</span><br>CINEMATIC</h2>
+    <p class="reveal">Ready to bring print production and localisation expertise to Sony Pictures.</p>
+    <a href="mailto:jan.lonnqvist@gmail.com" class="final-btn reveal">Get in Touch</a>
+</section>
+
+<footer>
+    <span>Jan Lönnqvist / 2026</span>
+    <span>jan.lonnqvist@gmail.com</span>
+</footer>
+
+</div>
+
+<script>
+// ── Sprocket holes
+function fillSprockets(id) {
+    const c = document.getElementById(id);
+    for (let i = 0; i < 60; i++) {
+        const h = document.createElement('div');
+        h.className = 'sprocket-hole';
+        c.appendChild(h);
+    }
+}
+fillSprockets('sprocketsL');
+fillSprockets('sprocketsR');
+
+// ── Countdown
+const countdown = document.getElementById('countdown');
+const cNum = document.getElementById('cNum');
+let count = 3;
+const countInterval = setInterval(() => {
+    count--;
+    if (count > 0) {
+        cNum.style.opacity = 0;
+        setTimeout(() => {
+            cNum.textContent = count;
+            cNum.style.opacity = 1;
+        }, 150);
+    } else {
+        clearInterval(countInterval);
+        cNum.style.opacity = 0;
+        setTimeout(() => countdown.classList.add('done'), 200);
+    }
+}, 700);
+// Initial show
+setTimeout(() => { cNum.style.opacity = 1; }, 100);
+
+// ── Scroll progress
+window.addEventListener('scroll', () => {
+    const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+    document.querySelector('.scroll-progress')?.style && 0; // no progress bar in this one - sprockets serve that role
+});
+
+// ── Scroll reveal
+const revealEls = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+            setTimeout(() => entry.target.classList.add('visible'), i * 50);
+            observer.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+revealEls.forEach(el => observer.observe(el));
+
+// ── Sprocket scroll speed sync
+const sprocketsL = document.getElementById('sprocketsL');
+const sprocketsR = document.getElementById('sprocketsR');
+window.addEventListener('scroll', () => {
+    const offset = -(window.scrollY * 0.5) % 26;
+    sprocketsL.style.transform = `translateY(${offset}px)`;
+    sprocketsR.style.transform = `translateY(${offset}px)`;
+});
+</script>
+
+</body>
+</html>
